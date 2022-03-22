@@ -11,6 +11,7 @@ from django.core.cache import cache
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 POSTS_PER_PAGE = 10
+POSTS_NUM = 15
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
@@ -35,7 +36,7 @@ class PostViewTests(TestCase):
                                        text=f'Тестовый пост номер {i}',
                                        pk=i,
                                        group=cls.group)
-                                  for i in range(POSTS_PER_PAGE)])
+                                  for i in range(POSTS_NUM)])
 
         small_gif = (
             b'\x47\x49\x46\x38\x39\x61\x02\x00'
