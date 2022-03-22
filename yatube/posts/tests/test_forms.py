@@ -2,16 +2,12 @@ import shutil
 import tempfile
 
 from ..forms import PostForm, CommentForm
-from ..models import Post, Group, Comment
+from ..models import Post, Group, Comment, User
 from django.conf import settings
 from django.test import Client, TestCase, override_settings
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 import datetime as dt
 from django.core.files.uploadedfile import SimpleUploadedFile
-
-
-User = get_user_model()
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
@@ -171,6 +167,8 @@ class PostFormTests(TestCase):
                 image=PostFormTests.post.image.name
             ).exists()
         )
+        self.assertEqual(response.context.get('post').text,
+                         'Новый текст')
 
     def test_comment_anon_user(self):
         form_data = {
@@ -215,3 +213,4 @@ class PostFormTests(TestCase):
                 post=PostFormTests.comment.post.id
             ).exists()
         )
+        self.assertIn(PostFormTests.comment, response.context['comments'])

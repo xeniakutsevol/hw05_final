@@ -1,6 +1,5 @@
 from django.test import TestCase, Client, override_settings
-from django.contrib.auth import get_user_model
-from ..models import Group, Post, Follow
+from ..models import Group, Post, Follow, User
 from django.urls import reverse
 from django import forms
 import tempfile
@@ -11,8 +10,6 @@ from django.core.cache import cache
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
-User = get_user_model()
-
 POSTS_PER_PAGE = 10
 
 
@@ -21,6 +18,7 @@ class PostViewTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.user_noname = User.objects.create_user(username='HasNoName')
         cls.user = User.objects.create_user(username='auth')
         cls.additional_user = User.objects.create_user(username='add_user')
         cls.group = Group.objects.create(
@@ -33,30 +31,12 @@ class PostViewTests(TestCase):
             slug='new_group',
             description='Тестовое описание новой группы',
         )
-        for i in range(1, 6):
-            Post.objects.create(
-                author=cls.additional_user,
-                text=f'Тестовый пост номер {i}',
-                pk=i,
-                group=cls.additional_group,
-                # pub_date=dt.datetime(2022, 2, 27)
-            )
-        for i in range(6, 11):
-            Post.objects.create(
-                author=cls.user,
-                text=f'Тестовый пост номер {i}',
-                pk=i,
-                # pub_date=dt.datetime(2022, 2, 28)
-            )
+        Post.objects.bulk_create([Post(author=cls.user,
+                                       text=f'Тестовый пост номер {i}',
+                                       pk=i,
+                                       group=cls.group)
+                                  for i in range(POSTS_PER_PAGE)])
 
-        for i in range(11, 26):
-            Post.objects.create(
-                author=cls.user,
-                text=f'Тестовый пост номер {i}',
-                pk=i,
-                group=cls.group,
-                # pub_date=dt.datetime(2022, 3, 1)
-            )
         small_gif = (
             b'\x47\x49\x46\x38\x39\x61\x02\x00'
             b'\x01\x00\x80\x00\x00\x00\x00\x00'
@@ -85,9 +65,9 @@ class PostViewTests(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
-        self.user = User.objects.create_user(username='HasNoName')
         self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
+        self.authorized_client.force_login(User.objects.get(
+            username='HasNoName'))
         self.author_client = Client()
         self.author_client.force_login(User.objects.get(username='auth'))
 

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import UniqueConstraint
 
 STRING_LEN = 15
 
@@ -84,3 +85,7 @@ class Follow(models.Model):
         verbose_name='Подписчик',
         related_name='follower'
     )
+
+    class Meta:
+        constraints = [UniqueConstraint(fields=['author', 'user'],
+                       name='unique_follower')]

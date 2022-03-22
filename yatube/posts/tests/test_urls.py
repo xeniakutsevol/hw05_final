@@ -1,9 +1,6 @@
 from django.test import TestCase, Client
-from django.contrib.auth import get_user_model
-from ..models import Group, Post, Follow
+from ..models import Group, Post, Follow, User
 from django.urls import reverse
-
-User = get_user_model()
 
 
 class StaticURLTests(TestCase):
@@ -24,6 +21,7 @@ class PostURLTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
+        cls.user_noname = User.objects.create_user(username='HasNoName')
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test_slug',
@@ -37,9 +35,9 @@ class PostURLTests(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
-        self.user = User.objects.create_user(username='HasNoName')
         self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
+        self.authorized_client.force_login(User.objects.get(
+            username='HasNoName'))
         self.author_client = Client()
         self.author_client.force_login(User.objects.get(username='auth'))
 

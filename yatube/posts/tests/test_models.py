@@ -1,10 +1,7 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase
-from ..models import Group, Post
+from ..models import Group, Post, User
 
 STRING_LEN = 15
-
-User = get_user_model()
 
 
 class PostModelTest(TestCase):

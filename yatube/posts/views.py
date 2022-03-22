@@ -40,7 +40,7 @@ def profile(request, username):
     template = 'posts/profile.html'
     author = get_object_or_404(User, username=username)
     author_posts = Post.objects.filter(author=author)
-    author_posts_count = Post.objects.filter(author=author).count()
+    author_posts_count = author_posts.count()
     paginator = Paginator(author_posts, POSTS_PER_PAGE)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
